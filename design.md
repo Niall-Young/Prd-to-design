@@ -16,13 +16,18 @@ requirements to concrete UI work without losing the original PRD intent.
 ## Core Workflow
 
 1. A user provides a Markdown PRD.
-2. `extract-prd-design-brief` reads the PRD and produces a structured design
+2. `extract-prd-design-brief` reads the PRD only to confirm it is accessible.
+3. Codex stops and asks the user to confirm whether the work is 0-1 or an iteration.
+   Iterations require a Figma URL before Codex proceeds.
+4. After confirmation, `extract-prd-design-brief` produces a structured design
    brief.
-3. `produce-design-change-report` turns that brief into a polished HTML report.
-4. If existing design context is needed, Codex reads Figma read-only when tools
-   are available, or asks the user for screenshots.
-5. Codex generates one UI concept image per key page by default.
-6. The report is used to review affected screens, interaction changes,
+5. `produce-design-change-report` writes `outputs/<project-slug>/report.json`
+   and renders `outputs/<project-slug>/design-change-report.html`.
+6. For iterations, Codex reads the provided Figma file read-only when tools are
+   available, or asks for exported frames/screenshots before making current-state
+   claims.
+7. Codex generates one UI concept image per key page by default.
+8. The report is used to review affected screens, interaction changes,
    component needs, risks, and open questions.
 
 ## Skill 1: Extract PRD Design Brief
@@ -39,11 +44,20 @@ The brief should capture only design-relevant information from the PRD:
 - Open questions where the PRD is ambiguous.
 
 The extraction should preserve PRD intent and avoid adding unrequested features.
+It must not infer project type silently: after reading the PRD, Codex asks the
+user to choose 0-1 or iteration. If the user chooses iteration, Codex must
+collect a Figma URL before finalizing the brief. Codex must not generate UI,
+reports, assets, or design briefs in the same response as the confirmation
+question. Codex must not include PRD conclusions or design task lists before the
+user answers the project-type question.
 
 ## Skill 2: Produce Design Change Report
 
-The HTML report should be a single, readable artifact with a Material Design 3
+The final report should be a single `.html` artifact with a Material Design 3
 inspired structure. It should prioritize scanability and implementation clarity.
+Markdown checklists or alignment notes are not valid final outputs for this
+skill unless the user separately asks for them. Chat-only design analysis is
+also not a valid final output; the design analysis belongs in the HTML report.
 
 Expected sections:
 
@@ -57,13 +71,14 @@ Expected sections:
 - Risks, dependencies, and open questions.
 - Suggested next design actions.
 - Generated UI concepts for key pages.
-- Multimodal flow cards when the PRD describes a process.
+- Connected flowchart diagrams when the PRD describes a process.
 
 ## Visual Direction
 
 - Use a calm, professional product design report style.
 - Use MD3-style seed color tonal roles exposed as CSS variables.
-- Use large rounded "memory card" surfaces for report sections and flow nodes.
+- Use large rounded "memory card" surfaces for report sections.
+- Use connected flowchart diagrams with arrows for process and state flows.
 - Prioritize readable hierarchy, spacing, and clear information grouping.
 - Keep the layout responsive for desktop and tablet review.
 - Use restrained color, accessible contrast, and consistent section structure.

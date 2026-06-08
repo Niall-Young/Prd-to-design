@@ -7,7 +7,14 @@ Use this shape when `$extract-prd-design-brief` finishes analyzing a Markdown PR
   "projectName": "string",
   "projectSlug": "string",
   "language": "zh-CN",
-  "projectType": "greenfield | iteration_with_design | iteration_no_design | unknown",
+  "projectType": "zero_to_one | iteration",
+  "projectTypeConfirmation": {
+    "status": "user_confirmed",
+    "questionAsked": "string",
+    "userAnswer": "string",
+    "figmaRequired": "boolean",
+    "figmaUrlProvided": "boolean"
+  },
   "source": {
     "prdPath": "string | null",
     "figmaUrl": "string | null",
@@ -86,5 +93,7 @@ Use this shape when `$extract-prd-design-brief` finishes analyzing a Markdown PR
 Rules:
 
 - Keep evidence short, preferably the PRD heading plus a short quote or paraphrase.
-- Do not invent project type. Use `unknown` if the PRD does not establish it.
+- Do not invent project type or derive it from the PRD alone. Read the PRD, ask the user to choose `zero_to_one` or `iteration`, and output the brief only after user confirmation.
+- Do not output this schema at all until the confirmation gate is complete. Before confirmation, the only valid response is the project-type question.
+- If `projectType` is `iteration`, `source.figmaUrl` is required. If the user has not provided a Figma URL, stop and ask for it instead of producing the final brief.
 - Attach PRD images to the nearest useful screen or flow node. If uncertain, still keep the asset in `source.assetManifest` and mention uncertainty.

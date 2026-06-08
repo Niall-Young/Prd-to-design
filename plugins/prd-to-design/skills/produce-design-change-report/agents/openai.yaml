@@ -1,4 +1,4 @@
 interface:
   display_name: "Produce Design Change Report"
-  short_description: "Create MD3 HTML reports from PRD design briefs"
-  default_prompt: "Use $produce-design-change-report to turn this design brief into an HTML report."
+  short_description: "Create HTML reports with flowchart diagrams"
+  default_prompt: "Use $produce-design-change-report only after the design brief has a user-confirmed project type. If I provide a PRD or unconfirmed brief, read it and reply only with the project-type question: 0-1 or iteration, with Figma link required for iteration. After confirmation, create outputs/<project-slug>/report.json and outputs/<project-slug>/design-change-report.html. Do not answer with inline design analysis as the final output."

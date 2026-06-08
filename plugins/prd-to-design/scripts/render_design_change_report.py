@@ -14,6 +14,13 @@ from typing import Any
 
 
 DEFAULT_SEED = "#006A6A"
+FLOW_NODE_TYPES = {
+    "start": "开始",
+    "process": "处理",
+    "decision": "判断",
+    "data": "数据",
+    "end": "结束",
+}
 
 
 def esc(value: Any) -> str:
@@ -212,20 +219,63 @@ def render_screens(screens: Any) -> str:
     return '<div class="screen-grid">' + "".join(cards) + "</div>"
 
 
+def normalize_flow_node_type(value: Any, index: int, total: int) -> str:
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in FLOW_NODE_TYPES:
+            return normalized
+    if index == 1:
+        return "start"
+    if index == total:
+        return "end"
+    return "process"
+
+
+def render_flow_edges(edges: Any) -> str:
+    pills = []
+    for edge in as_list(edges):
+        if not isinstance(edge, dict):
+            continue
+        start = edge.get("from")
+        end = edge.get("to")
+        if not start or not end:
+            continue
+        label = edge.get("label")
+        label_html = f"<span>{esc(label)}</span>" if label else ""
+        pills.append(
+            '<span class="edge-pill">'
+            f"<strong>{esc(start)} → {esc(end)}</strong>"
+            f"{label_html}"
+            "</span>"
+        )
+    if not pills:
+        return ""
+    return '<div class="flow-edges" aria-label="分支关系">' + "".join(pills) + "</div>"
+
+
 def render_flows(flows: Any) -> str:
     rendered_flows = []
     for flow in as_list(flows):
         if not isinstance(flow, dict):
             continue
+        raw_nodes = as_list(flow.get("nodes"))
         nodes = []
-        for index, node in enumerate(as_list(flow.get("nodes")), start=1):
+        total_nodes = len(raw_nodes)
+        for index, node in enumerate(raw_nodes, start=1):
             if isinstance(node, str):
                 node = {"title": node}
             if not isinstance(node, dict):
                 continue
-            chips = "".join(tag(value) for value in [node.get("status"), node.get("role"), node.get("screen")] if value)
+            node_type = normalize_flow_node_type(node.get("type") or node.get("shape"), index, total_nodes)
+            node_id = node.get("id") or f"node-{index:02d}"
+            type_label = FLOW_NODE_TYPES[node_type]
+            chips = "".join(tag(value) for value in [type_label, node.get("status"), node.get("role"), node.get("screen")] if value)
+            branch_label = node.get("branchLabel") or node.get("edgeLabel")
+            branch_html = f'<div class="branch-label">{esc(branch_label)}</div>' if branch_label else ""
             nodes.append(
-                '<article class="flow-node">'
+                '<li class="flow-step">'
+                f"{branch_html}"
+                f'<article class="flow-node is-{esc(node_type)}" data-node-id="{esc(node_id)}">'
                 f'<div class="node-index">{index:02d}</div>'
                 f'<div class="tag-row">{chips}</div>'
                 f'<h3>{esc(node.get("title") or "未命名节点")}</h3>'
@@ -234,18 +284,20 @@ def render_flows(flows: Any) -> str:
                 f'<div class="node-action"><strong>设计动作</strong><span>{esc(node.get("designAction") or "待确认")}</span></div>'
                 f'<p class="evidence">{esc(node.get("evidence") or "")}</p>'
                 "</article>"
+                "</li>"
             )
         if not nodes:
             continue
         meta = "".join(tag(value) for value in [flow.get("trigger"), flow.get("goal")] if value)
         rendered_flows.append(
-            '<article class="flow-card">'
+            '<article class="flow-diagram-card">'
             f'<div class="flow-head"><div><h3>{esc(flow.get("name") or "未命名流程")}</h3></div><div class="tag-row">{meta}</div></div>'
-            f'<div class="flow-track">{"".join(nodes)}</div>'
+            f'<ol class="flow-diagram" aria-label="{esc(flow.get("name") or "流程图")}">{"".join(nodes)}</ol>'
+            f'{render_flow_edges(flow.get("edges"))}'
             "</article>"
         )
     if not rendered_flows:
-        return '<p class="muted">PRD 未提供明确流程，报告未生成流程图卡片。</p>'
+        return '<p class="muted">PRD 未提供明确流程，报告未生成流程图。</p>'
     return "".join(rendered_flows)
 
 
@@ -284,7 +336,7 @@ def render_report(report: dict[str, Any]) -> str:
     body.append(section("设计目标", list_items(report.get("goals")), "Goals"))
     body.append(section("新增 / 修改 / 删除", render_impact(report.get("impactMatrix")), "Impact"))
     body.append(section("页面级改动", render_screens(report.get("screens")), "Screens"))
-    body.append(section("流程图卡片", render_flows(report.get("flows")), "Flows"))
+    body.append(section("流程图", render_flows(report.get("flows")), "Flows"))
     body.append(section("UI 概念图", render_concepts(report.get("generatedConcepts")), "Generated UI"))
     body.append(section("组件 / 内容 / 状态需求", list_items(report.get("requirements")), "Requirements"))
     body.append(section("风险", list_items(report.get("risks")), "Risks"))
@@ -341,7 +393,7 @@ def render_report(report: dict[str, Any]) -> str:
   }}
   .tag.source {{ background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }}
   .eyebrow {{ margin-bottom: 8px; color: var(--md-sys-color-primary); font-size: .78rem; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }}
-  .memory-card, .mini-card, .screen-card, .concept-card, .flow-card, .flow-node {{
+  .memory-card, .mini-card, .screen-card, .concept-card, .flow-diagram-card, .flow-node {{
     border: 1px solid var(--md-sys-color-outline-variant);
     border-radius: var(--card-radius);
     background: var(--md-sys-color-surface-container);
@@ -356,21 +408,51 @@ def render_report(report: dict[str, Any]) -> str:
   .media-card {{ position: relative; margin: 12px 0; overflow: hidden; border-radius: 20px; background: var(--md-sys-color-surface-container-high); }}
   .media-card img {{ display: block; width: 100%; max-height: 360px; object-fit: cover; }}
   .media-card .tag {{ position: absolute; left: 10px; bottom: 10px; backdrop-filter: blur(8px); }}
-  .flow-card {{ padding: 18px; background: var(--md-sys-color-surface-container-low); }}
-  .flow-card + .flow-card {{ margin-top: 16px; }}
+  .flow-diagram-card {{ padding: 18px; background: var(--md-sys-color-surface-container-low); }}
+  .flow-diagram-card + .flow-diagram-card {{ margin-top: 16px; }}
   .flow-head {{ display: flex; justify-content: space-between; gap: 12px; margin-bottom: 16px; }}
-  .flow-track {{ display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 28px; overflow-x: auto; padding: 4px 4px 12px; }}
-  .flow-node {{ position: relative; min-width: 230px; padding: 18px; background: var(--md-sys-color-surface-container-high); }}
-  .flow-node:not(:last-child)::after {{
-    content: "→";
-    position: absolute;
-    right: -24px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--md-sys-color-primary);
-    font-size: 1.4rem;
-    font-weight: 800;
+  .flow-diagram {{
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(250px, 1fr);
+    gap: 54px;
+    list-style: none;
+    margin: 0;
+    overflow-x: auto;
+    padding: 4px 4px 14px;
   }}
+  .flow-step {{ position: relative; display: grid; min-width: 250px; }}
+  .flow-step:not(:last-child)::after {{
+    content: "";
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    width: 34px;
+    border-top: 2px solid var(--md-sys-color-primary);
+  }}
+  .flow-step:not(:last-child)::before {{
+    content: "";
+    position: absolute;
+    left: calc(100% + 36px);
+    top: calc(50% - 5px);
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid var(--md-sys-color-primary);
+    border-right: 2px solid var(--md-sys-color-primary);
+    transform: rotate(45deg);
+    z-index: 1;
+  }}
+  .flow-node {{ position: relative; min-width: 0; min-height: 100%; padding: 18px; background: var(--md-sys-color-surface-container-high); }}
+  .flow-node.is-start, .flow-node.is-end {{ border-radius: 999px; align-content: center; }}
+  .flow-node.is-decision {{
+    border-style: dashed;
+    background: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-on-tertiary-container);
+  }}
+  .flow-node.is-data {{ background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }}
+  .branch-label {{ justify-self: center; margin: 0 0 8px; padding: 3px 10px; border-radius: 999px; background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); font-size: .74rem; font-weight: 800; }}
+  .flow-edges {{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }}
+  .edge-pill {{ display: inline-grid; gap: 2px; padding: 8px 12px; border-radius: 16px; background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-size: .8rem; }}
   .node-index {{ color: var(--md-sys-color-primary); font-weight: 850; margin-bottom: 8px; }}
   .node-action {{ display: grid; gap: 4px; margin-top: 12px; padding: 12px; border-radius: 18px; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }}
   .evidence, .muted {{ color: color-mix(in srgb, var(--md-sys-color-on-surface) 68%, transparent); font-size: .9rem; }}
@@ -380,8 +462,9 @@ def render_report(report: dict[str, Any]) -> str:
     header.report-header, .memory-card {{ padding: 18px; border-radius: 24px; }}
     .two-col, .three-col {{ grid-template-columns: 1fr; }}
     .flow-head {{ display: grid; }}
-    .flow-track {{ display: grid; grid-auto-flow: row; grid-auto-columns: unset; overflow-x: visible; gap: 14px; }}
-    .flow-node:not(:last-child)::after {{ content: "↓"; right: 50%; top: auto; bottom: -24px; transform: translateX(50%); }}
+    .flow-diagram {{ grid-auto-flow: row; grid-auto-columns: unset; overflow-x: visible; gap: 34px; }}
+    .flow-step:not(:last-child)::after {{ left: 50%; top: calc(100% + 6px); width: 0; height: 22px; border-top: 0; border-left: 2px solid var(--md-sys-color-primary); }}
+    .flow-step:not(:last-child)::before {{ left: calc(50% - 5px); top: calc(100% + 22px); transform: rotate(135deg); }}
   }}
 """
 
@@ -405,7 +488,7 @@ def render_report(report: dict[str, Any]) -> str:
       <p>设计变更报告 · 生成时间 {esc(generated_at)}</p>
     </header>
     {''.join(body)}
-    <footer>Generated by PRD to Design. HTML uses MD3-style tonal CSS variables and rounded memory-card surfaces.</footer>
+    <footer>Generated by PRD to Design. HTML uses MD3-style tonal CSS variables and CSS-rendered flowchart diagrams.</footer>
   </main>
 </body>
 </html>
@@ -421,6 +504,8 @@ def main() -> int:
 
     input_path = Path(args.input).expanduser().resolve()
     output_path = Path(args.output).expanduser().resolve()
+    if output_path.suffix.lower() not in {".html", ".htm"}:
+        raise SystemExit("Output path must end in .html or .htm; Markdown outputs are not supported.")
     report = json.loads(input_path.read_text(encoding="utf-8"))
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(render_report(report), encoding="utf-8")

@@ -7,6 +7,11 @@
   "projectName": "string",
   "projectSlug": "string",
   "language": "zh-CN",
+  "projectType": "zero_to_one | iteration",
+  "source": {
+    "prdPath": "string | null",
+    "figmaUrl": "string | null"
+  },
   "seedColor": "#006A6A",
   "seedSource": "figma | screenshot | prd | default",
   "summary": "string",
@@ -36,8 +41,11 @@
       "name": "string",
       "trigger": "string",
       "goal": "string",
+      "diagramType": "flowchart",
       "nodes": [
         {
+          "id": "string",
+          "type": "start | process | decision | data | end",
           "title": "string",
           "description": "string",
           "role": "string",
@@ -50,6 +58,13 @@
             "alt": "string",
             "source": "prd | figma | screenshot | generated"
           }
+        }
+      ],
+      "edges": [
+        {
+          "from": "string",
+          "to": "string",
+          "label": "string | null"
         }
       ]
     }
@@ -73,5 +88,8 @@
 Notes:
 
 - `seedColor` is optional. When absent, the renderer uses a stable default and labels the source as `default`.
+- `projectType` must come from the user-confirmed design brief. If it is `iteration`, include the required Figma URL in `source.figmaUrl`.
+- Do not create report JSON until the PRD has passed the user confirmation gate. Before confirmation, ask the project-type question and wait.
+- Final reports must be rendered to `.html`; Markdown is not a valid final report format for this skill.
 - Image paths should be relative to the HTML file location.
-- Flow nodes are rendered as multimodal cards when `image.path` or `image` is present.
+- Flow nodes are rendered as CSS flowchart nodes. Use `diagramType: "flowchart"` and add `edges[]` for branch or loop labels.

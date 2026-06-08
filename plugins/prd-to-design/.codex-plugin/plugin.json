@@ -1,15 +1,15 @@
 {
   "name": "prd-to-design",
-  "version": "0.1.0+codex.20260608025148",
-  "description": "Convert Markdown PRDs into design briefs, generated UI concepts, and MD3 HTML design change reports.",
+  "version": "0.1.2+codex.20260608115209",
+  "description": "Read Markdown PRDs, stop for 0-1 vs iteration confirmation, collect Figma links for iterations, and then create MD3 HTML design reports with flowchart diagrams.",
   "author": {
     "name": "Local developer"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "PRD to Design",
-    "shortDescription": "Turn PRDs into design briefs and reports.",
-    "longDescription": "PRD to Design helps Codex read Markdown PRDs, extract design-impacting work, analyze current Figma or screenshot context, generate UI concept images, and render a Chinese MD3-style HTML design change report.",
+    "shortDescription": "Read PRDs, ask type, output HTML.",
+    "longDescription": "PRD to Design helps Codex read Markdown PRDs, stop and ask whether the work is 0-1 or an iteration, collect a Figma link for iterations, then write report JSON and render a Chinese MD3-style HTML design change report with connected flowchart diagrams. Design analysis belongs in the generated HTML, not as a chat-only answer.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [
@@ -22,8 +22,8 @@
     "logo": "./assets/prd-to-design-logo.png",
     "screenshots": [],
     "defaultPrompt": [
-      "Analyze a Markdown PRD and create a design change report.",
-      "Turn this PRD into a Chinese MD3 HTML design report."
+      "Read a Markdown PRD, stop and ask whether it is 0-1 or an iteration. If it is an iteration, ask for the Figma link before doing any design or UI generation. After I answer, create outputs/<project-slug>/design-change-report.html.",
+      "Turn this PRD into a Chinese MD3 HTML design report with flowcharts. First read it and ask me whether it is 0-1 or an iteration. After confirmation, do not answer with inline design analysis; create the HTML file and return its path."
     ]
   }
 }

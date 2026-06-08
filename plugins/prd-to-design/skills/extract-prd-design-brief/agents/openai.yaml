@@ -1,4 +1,4 @@
 interface:
   display_name: "Extract PRD Design Brief"
-  short_description: "Extract design tasks from Markdown PRDs"
-  default_prompt: "Use $extract-prd-design-brief to analyze this Markdown PRD for design work."
+  short_description: "Read PRDs, stop for 0-1 vs iteration confirmation"
+  default_prompt: "Use $extract-prd-design-brief to read this Markdown PRD. After reading it, reply only with the question asking whether it is 0-1 or an iteration, and ask for the Figma link if it is an iteration. After I answer, write outputs/<project-slug>/design-brief.json and continue to the HTML report unless I explicitly ask for only the brief."
