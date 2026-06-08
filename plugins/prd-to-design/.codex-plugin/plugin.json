@@ -1,6 +1,6 @@
 {
   "name": "prd-to-design",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260608025148",
   "description": "Convert Markdown PRDs into design briefs, generated UI concepts, and MD3 HTML design change reports.",
   "author": {
     "name": "Local developer"
@@ -17,6 +17,13 @@
       "Write",
       "Interactive"
     ],
-    "defaultPrompt": "Analyze this Markdown PRD and create a design change report."
+    "brandColor": "#5B16B7",
+    "composerIcon": "./assets/prd-to-design-small.png",
+    "logo": "./assets/prd-to-design-logo.png",
+    "screenshots": [],
+    "defaultPrompt": [
+      "Analyze a Markdown PRD and create a design change report.",
+      "Turn this PRD into a Chinese MD3 HTML design report."
+    ]
   }
 }

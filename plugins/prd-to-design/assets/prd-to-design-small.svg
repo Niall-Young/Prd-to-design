@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="PRD to Design">
+  <rect width="128" height="128" rx="32" fill="#D1FAFA"/>
+  <path d="M31 34h41c13 0 23 10 23 23v37H54c-13 0-23-10-23-23V34Z" fill="#006A6A"/>
+  <path d="M47 52h30M47 65h23M47 78h16" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="91" cy="37" r="14" fill="#8F4D00"/>
+  <path d="M84 37h14M91 30v14" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+</svg>

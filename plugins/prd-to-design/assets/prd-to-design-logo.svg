@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="PRD to Design">
+  <rect width="512" height="512" rx="128" fill="#D1FAFA"/>
+  <rect x="112" y="120" width="252" height="276" rx="72" fill="#006A6A"/>
+  <path d="M164 190h154M164 244h126M164 298h86" stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="363" cy="144" r="58" fill="#8F4D00"/>
+  <path d="M335 144h56M363 116v56" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round"/>
+</svg>
