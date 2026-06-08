@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extract PRD Design Brief"
+  short_description: "Extract design tasks from Markdown PRDs"
+  default_prompt: "Use $extract-prd-design-brief to analyze this Markdown PRD for design work."

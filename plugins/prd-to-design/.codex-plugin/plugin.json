@@ -1,0 +1,22 @@
+{
+  "name": "prd-to-design",
+  "version": "0.1.0",
+  "description": "Convert Markdown PRDs into design briefs, generated UI concepts, and MD3 HTML design change reports.",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "PRD to Design",
+    "shortDescription": "Turn PRDs into design briefs and reports.",
+    "longDescription": "PRD to Design helps Codex read Markdown PRDs, extract design-impacting work, analyze current Figma or screenshot context, generate UI concept images, and render a Chinese MD3-style HTML design change report.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "defaultPrompt": "Analyze this Markdown PRD and create a design change report."
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Produce Design Change Report"
+  short_description: "Create MD3 HTML reports from PRD design briefs"
+  default_prompt: "Use $produce-design-change-report to turn this design brief into an HTML report."
